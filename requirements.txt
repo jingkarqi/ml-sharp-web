@@ -2,6 +2,8 @@
 #    uv pip compile requirements.in -o requirements.txt --universal
 -e .
     # via -r requirements.in
+flask
+    # via app
 certifi==2025.8.3
     # via requests
 charset-normalizer==3.4.3

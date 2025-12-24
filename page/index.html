@@ -1,0 +1,1065 @@
+<!doctype html>
+<html lang="zh-Hans">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>SHARP Local Studio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: #f5f5f7;
+        --panel: #ffffff;
+        --panel-2: #fbfbfd;
+        --text: #1d1d1f;
+        --muted: #6e6e73;
+        --accent: #0071e3;
+        --accent-2: #0a84ff;
+        --danger: #d93025;
+        --ring: rgba(0, 113, 227, 0.25);
+        --shadow: 0 16px 40px rgba(0, 0, 0, 0.12);
+        --glass-bg: rgba(255, 255, 255, 0.72);
+        --glass-border: rgba(255, 255, 255, 0.6);
+        --glass-highlight: rgba(255, 255, 255, 0.85);
+        --glass-shadow: 0 18px 50px rgba(0, 0, 0, 0.12);
+        --radius: 20px;
+        --line: rgba(0, 0, 0, 0.08);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: "Source Sans 3", "Noto Sans SC", "Segoe UI", sans-serif;
+        color: var(--text);
+        background: radial-gradient(circle at top, #ffffff 0%, #f5f5f7 45%) fixed;
+        overflow-x: hidden;
+      }
+
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background-image: radial-gradient(
+            circle at 20% 10%,
+            rgba(0, 113, 227, 0.08),
+            transparent 40%
+          ),
+          radial-gradient(circle at 80% 0%, rgba(0, 113, 227, 0.06), transparent 35%);
+        pointer-events: none;
+        z-index: -1;
+      }
+
+      body::after {
+        content: "";
+        position: fixed;
+        width: 70vw;
+        height: 70vw;
+        top: -35vw;
+        right: -20vw;
+        background: radial-gradient(
+            circle at 30% 30%,
+            rgba(10, 132, 255, 0.18),
+            transparent 60%
+          ),
+          radial-gradient(circle at 70% 70%, rgba(0, 113, 227, 0.15), transparent 55%);
+        filter: blur(45px);
+        opacity: 0.9;
+        pointer-events: none;
+        z-index: -2;
+      }
+
+      .shell {
+        max-width: 1120px;
+        margin: 0 auto;
+        padding: 56px 24px 72px;
+        display: flex;
+        flex-direction: column;
+        gap: 32px;
+        animation: fade-up 0.9s ease both;
+      }
+
+      header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 28px;
+      }
+
+      .title {
+        font-size: clamp(34px, 4vw, 52px);
+        letter-spacing: -0.02em;
+        font-weight: 600;
+      }
+
+      .title span {
+        display: inline-block;
+      }
+
+      .title-accent {
+        color: var(--accent);
+        text-shadow: 0 0 18px rgba(0, 113, 227, 0.2);
+        margin: 0 6px;
+      }
+
+      .subtitle {
+        color: var(--muted);
+        max-width: 620px;
+        font-size: 15px;
+        line-height: 1.6;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: minmax(260px, 1fr) minmax(320px, 1.4fr);
+        gap: 24px;
+      }
+
+      .panel {
+        background: var(--glass-bg);
+        border-radius: var(--radius);
+        padding: 26px;
+        box-shadow: var(--glass-shadow);
+        border: 1px solid var(--glass-border);
+        position: relative;
+        overflow: hidden;
+        backdrop-filter: blur(20px) saturate(180%);
+        -webkit-backdrop-filter: blur(20px) saturate(180%);
+      }
+
+      .panel::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        border-radius: inherit;
+        border: 1px solid rgba(255, 255, 255, 0.7);
+        pointer-events: none;
+        z-index: 2;
+      }
+
+      .panel::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        border-radius: inherit;
+        background: linear-gradient(
+          135deg,
+          rgba(255, 255, 255, 0.9),
+          rgba(255, 255, 255, 0.4) 40%,
+          rgba(255, 255, 255, 0) 65%
+        );
+        opacity: 0.45;
+        pointer-events: none;
+        z-index: 0;
+      }
+
+      .panel > * {
+        position: relative;
+        z-index: 1;
+      }
+
+      .status-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding: 6px 12px;
+        background: rgba(255, 255, 255, 0.6);
+        border-radius: 999px;
+        font-size: 12px;
+        text-transform: none;
+        letter-spacing: 0.02em;
+        font-weight: 600;
+        border: 1px solid var(--glass-border);
+        backdrop-filter: blur(12px) saturate(160%);
+        -webkit-backdrop-filter: blur(12px) saturate(160%);
+      }
+
+      .header-actions {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+      }
+
+      .lang-switch {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.6);
+        border: 1px solid var(--glass-border);
+        backdrop-filter: blur(12px) saturate(160%);
+        -webkit-backdrop-filter: blur(12px) saturate(160%);
+      }
+
+      .lang-switch button {
+        border: none;
+        background: transparent;
+        color: var(--muted);
+        font-size: 11px;
+        letter-spacing: 0.02em;
+        text-transform: none;
+        padding: 6px 12px;
+        border-radius: 999px;
+        cursor: pointer;
+        transition: background 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+      }
+
+      .lang-switch button.active {
+        background: var(--accent);
+        color: #fff;
+        box-shadow: 0 10px 20px rgba(0, 113, 227, 0.2);
+      }
+
+      .status-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: var(--muted);
+        box-shadow: 0 0 12px rgba(0, 0, 0, 0.08);
+      }
+
+      .status-dot.ready {
+        background: var(--accent);
+        box-shadow: 0 0 14px rgba(0, 113, 227, 0.4);
+      }
+
+      .status-dot.busy {
+        background: var(--accent-2);
+        box-shadow: 0 0 14px rgba(10, 132, 255, 0.45);
+      }
+
+      .status-dot.error {
+        background: var(--danger);
+        box-shadow: 0 0 14px rgba(217, 48, 37, 0.4);
+      }
+
+      .steps {
+        margin: 18px 0 0;
+        padding: 0;
+        list-style: none;
+        display: grid;
+        gap: 12px;
+      }
+
+      .steps li {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 12px;
+        border-radius: 14px;
+        background: rgba(255, 255, 255, 0.65);
+        border: 1px solid rgba(255, 255, 255, 0.6);
+        backdrop-filter: blur(10px) saturate(150%);
+        -webkit-backdrop-filter: blur(10px) saturate(150%);
+      }
+
+      .step-index {
+        color: var(--accent);
+        font-weight: 700;
+        letter-spacing: 0.1em;
+      }
+
+      .metrics {
+        margin-top: 20px;
+        display: grid;
+        gap: 8px;
+        font-size: 12px;
+        color: var(--muted);
+      }
+
+      .drop-zone {
+        border-radius: 18px;
+        border: 1px dashed rgba(0, 113, 227, 0.28);
+        background: rgba(255, 255, 255, 0.6);
+        padding: 18px;
+        display: grid;
+        gap: 8px;
+        align-items: center;
+        text-align: center;
+        transition: border-color 0.2s ease, background 0.2s ease, transform 0.2s ease;
+        backdrop-filter: blur(14px) saturate(160%);
+        -webkit-backdrop-filter: blur(14px) saturate(160%);
+      }
+
+      .drop-zone.dragover {
+        border-color: var(--accent-2);
+        background: rgba(10, 132, 255, 0.12);
+        transform: translateY(-2px);
+      }
+
+      .drop-zone input {
+        display: none;
+      }
+
+      .drop-title {
+        font-size: 18px;
+        font-weight: 600;
+      }
+
+      .drop-note {
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      .preview {
+        margin-top: 18px;
+        background: rgba(255, 255, 255, 0.65);
+        border-radius: 16px;
+        padding: 12px;
+        min-height: 180px;
+        display: grid;
+        place-items: center;
+        border: 1px solid rgba(255, 255, 255, 0.6);
+        backdrop-filter: blur(14px) saturate(160%);
+        -webkit-backdrop-filter: blur(14px) saturate(160%);
+      }
+
+      .preview img {
+        max-width: 100%;
+        max-height: 240px;
+        border-radius: 12px;
+        display: none;
+      }
+
+      .preview span {
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      .actions {
+        margin-top: 18px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+      }
+
+      .btn {
+        border: none;
+        border-radius: 999px;
+        padding: 12px 18px;
+        font-family: "Source Sans 3", "Noto Sans SC", "Segoe UI", sans-serif;
+        font-size: 13px;
+        letter-spacing: 0.02em;
+        text-transform: none;
+        cursor: pointer;
+        transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+      }
+
+      .btn.primary {
+        background: var(--accent);
+        color: #fff;
+        box-shadow: 0 12px 24px rgba(0, 113, 227, 0.25);
+      }
+
+      .btn.secondary {
+        background: transparent;
+        border: 1px solid var(--line);
+        color: var(--text);
+      }
+
+      .btn:disabled,
+      .btn.disabled {
+        cursor: not-allowed;
+        opacity: 0.45;
+        transform: none;
+        box-shadow: none;
+      }
+
+      .log {
+        margin-top: 18px;
+        background: rgba(255, 255, 255, 0.7);
+        border-radius: 16px;
+        padding: 16px;
+        font-size: 12px;
+        color: var(--muted);
+        height: 160px;
+        overflow-y: auto;
+        border: 1px solid rgba(255, 255, 255, 0.6);
+        backdrop-filter: blur(16px) saturate(170%);
+        -webkit-backdrop-filter: blur(16px) saturate(170%);
+      }
+
+      .log p {
+        margin: 0 0 8px;
+      }
+
+      .btn.danger {
+        border: 1px solid rgba(217, 48, 37, 0.35);
+        color: var(--danger);
+        background: rgba(217, 48, 37, 0.08);
+      }
+
+      .library-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        flex-wrap: wrap;
+      }
+
+      .library-subtitle {
+        color: var(--muted);
+        font-size: 12px;
+        margin-top: 6px;
+      }
+
+      .output-list {
+        margin-top: 16px;
+        display: grid;
+        gap: 12px;
+      }
+
+      .output-item {
+        display: grid;
+        grid-template-columns: minmax(200px, 1.2fr) minmax(160px, 1fr) auto;
+        gap: 16px;
+        align-items: center;
+        padding: 12px 14px;
+        border-radius: 14px;
+        background: rgba(255, 255, 255, 0.65);
+        border: 1px solid rgba(255, 255, 255, 0.6);
+        backdrop-filter: blur(12px) saturate(160%);
+        -webkit-backdrop-filter: blur(12px) saturate(160%);
+      }
+
+      .output-name {
+        font-weight: 600;
+        word-break: break-all;
+      }
+
+      .output-meta {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        font-size: 12px;
+        color: var(--muted);
+      }
+
+      .output-actions {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+      }
+
+      .output-actions .btn {
+        padding: 8px 12px;
+        font-size: 11px;
+      }
+
+      .output-empty {
+        margin-top: 16px;
+        font-size: 12px;
+        color: var(--muted);
+      }
+
+      footer {
+        display: flex;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 12px;
+        color: var(--muted);
+        font-size: 11px;
+        letter-spacing: 0.04em;
+        text-transform: none;
+      }
+
+      @keyframes fade-up {
+        from {
+          opacity: 0;
+          transform: translateY(12px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @media (max-width: 900px) {
+        header {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+
+        .grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      @media (max-width: 720px) {
+        .output-item {
+          grid-template-columns: 1fr;
+          align-items: flex-start;
+        }
+
+        .output-actions {
+          justify-content: flex-start;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="shell">
+      <header>
+        <div>
+          <div class="title">
+            <span data-i18n="titleBrand">SHARP</span>
+            <span class="title-accent" data-i18n="titleAccent">本地</span>
+            <span data-i18n="titleSuffix">工作台</span>
+          </div>
+          <p class="subtitle" data-i18n="subtitle">
+            加载单张图片，在本地生成 3D Gaussian 的 PLY，然后打开 PlayCanvas Viewer 预加载该模型。
+          </p>
+        </div>
+        <div class="header-actions">
+          <div class="status-pill">
+            <div id="statusDot" class="status-dot"></div>
+            <span id="statusText" data-i18n="statusBooting">启动中</span>
+          </div>
+          <div class="lang-switch">
+            <button type="button" data-lang="zh">中文</button>
+            <button type="button" data-lang="en">EN</button>
+          </div>
+        </div>
+      </header>
+
+      <section class="grid">
+        <div class="panel">
+          <h3 data-i18n="pipelineTitle">流程</h3>
+          <ol class="steps">
+            <li><span class="step-index">01</span> <span data-i18n="step1">加载文件</span></li>
+            <li><span class="step-index">02</span> <span data-i18n="step2">生成 Gaussian Splat</span></li>
+            <li><span class="step-index">03</span> <span data-i18n="step3">在 Viewer 中查看 PLY</span></li>
+          </ol>
+          <div class="metrics">
+            <div id="deviceLine">设备：等待中</div>
+            <div id="checkpointLine">检查点：默认</div>
+            <div id="outputLine">输出：-</div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <label class="drop-zone" id="dropZone">
+            <input id="fileInput" type="file" accept="image/*" />
+            <div class="drop-title" data-i18n="dropTitle">拖拽图片或点击选择</div>
+            <div class="drop-note" data-i18n="dropNote">支持 jpg, png, heic, tiff 等</div>
+          </label>
+
+          <div class="preview">
+            <img id="previewImg" alt="preview" />
+            <span id="previewHint" data-i18n="previewHint">尚未选择图片。</span>
+          </div>
+
+          <div class="actions">
+            <button id="generateBtn" class="btn primary" disabled data-i18n="generateBtn">
+              开始生成
+            </button>
+            <a
+              id="viewerBtn"
+              class="btn secondary disabled"
+              href="#"
+              target="_blank"
+              rel="noopener"
+              data-i18n="viewerBtn"
+              >打开 Viewer</a
+            >
+          </div>
+
+          <div class="log" id="log"></div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="library-header">
+          <div>
+            <h3 data-i18n="libraryTitle">已生成模型</h3>
+            <div class="library-subtitle" data-i18n="librarySubtitle">
+              扫描 output 文件夹，可重命名、删除或跳转查看。
+            </div>
+          </div>
+          <button id="refreshOutputsBtn" class="btn secondary" data-i18n="refreshBtn">
+            刷新列表
+          </button>
+        </div>
+        <div id="outputsList" class="output-list"></div>
+        <div id="outputsEmpty" class="output-empty" data-i18n="outputsEmpty">暂无生成模型。</div>
+      </section>
+
+      <footer>
+        <span data-i18n="footerNote">仅本地运行。关闭此页面将停止服务。</span>
+        <span id="clock">Ready</span>
+      </footer>
+    </main>
+
+    <script>
+      const statusDot = document.getElementById("statusDot");
+      const statusText = document.getElementById("statusText");
+      const deviceLine = document.getElementById("deviceLine");
+      const checkpointLine = document.getElementById("checkpointLine");
+      const outputLine = document.getElementById("outputLine");
+      const logEl = document.getElementById("log");
+      const fileInput = document.getElementById("fileInput");
+      const dropZone = document.getElementById("dropZone");
+      const previewImg = document.getElementById("previewImg");
+      const previewHint = document.getElementById("previewHint");
+      const generateBtn = document.getElementById("generateBtn");
+      const viewerBtn = document.getElementById("viewerBtn");
+      const clockEl = document.getElementById("clock");
+      const outputsList = document.getElementById("outputsList");
+      const outputsEmpty = document.getElementById("outputsEmpty");
+      const refreshOutputsBtn = document.getElementById("refreshOutputsBtn");
+
+      let selectedFile = null;
+      let previewUrl = null;
+      let currentLang = "zh";
+      let statusState = "";
+      let statusKey = "statusBooting";
+      let deviceValue = null;
+      let checkpointStatus = "default";
+      let outputValue = null;
+
+      const i18n = {
+        zh: {
+          titleBrand: "SHARP",
+          titleAccent: "本地",
+          titleSuffix: "工作台",
+          subtitle:
+            "加载单张图片，在本地生成 3D Gaussian 的 PLY，然后打开 PlayCanvas Viewer 预加载该模型。",
+          pipelineTitle: "流程",
+          step1: "加载文件",
+          step2: "生成 Gaussian Splat",
+          step3: "在 Viewer 中查看 PLY",
+          dropTitle: "拖拽图片或点击选择",
+          dropNote: "支持 jpg, png, heic, tiff 等",
+          previewHint: "尚未选择图片。",
+          generateBtn: "开始生成",
+          viewerBtn: "打开 Viewer",
+          footerNote: "仅本地运行。关闭此页面将停止服务。",
+          statusBooting: "启动中",
+          statusLoading: "正在加载模型",
+          statusReady: "模型就绪",
+          statusBusy: "生成中",
+          statusError: "模型错误",
+          statusOffline: "服务器离线",
+          statusGenFailed: "生成失败",
+          deviceLabel: "设备",
+          checkpointLabel: "检查点",
+          outputLabel: "输出",
+          pending: "等待中",
+          checkpoint_default: "默认",
+          checkpoint_ready: "已加载",
+          outputEmpty: "-",
+          libraryTitle: "已生成模型",
+          librarySubtitle: "扫描 output 文件夹，可重命名、删除或跳转查看。",
+          outputsEmpty: "暂无生成模型。",
+          refreshBtn: "刷新列表",
+          actionView: "查看",
+          actionRename: "重命名",
+          actionDelete: "删除",
+          promptRename: "请输入新名称（可不含 .ply）",
+          confirmDelete: "确定删除 {name} 吗？",
+          logSelected: "已选择 {name}",
+          logModelError: "模型错误：{error}",
+          logUpload: "正在加载文件...",
+          logGenDone: "生成完成。",
+          logSelectFirst: "请先加载一张图片。",
+          logOutputsFail: "读取本地模型列表失败。",
+          logRenamed: "已重命名为 {name}",
+          logDeleted: "已删除 {name}",
+          logServerOffline: "无法连接服务器。",
+        },
+        en: {
+          titleBrand: "SHARP",
+          titleAccent: "Local",
+          titleSuffix: "Studio",
+          subtitle:
+            "Load a single image, generate a 3D Gaussian PLY locally, then jump to the PlayCanvas viewer with the generated asset preloaded.",
+          pipelineTitle: "Pipeline",
+          step1: "Load an image file",
+          step2: "Generate Gaussian splats",
+          step3: "Open viewer with PLY loaded",
+          dropTitle: "Drop image or click to select",
+          dropNote: "Supported: jpg, png, heic, tiff, etc.",
+          previewHint: "No image loaded yet.",
+          generateBtn: "Generate PLY",
+          viewerBtn: "Open Viewer",
+          footerNote: "Local only. Closing this page will stop the server.",
+          statusBooting: "Booting",
+          statusLoading: "Loading model",
+          statusReady: "Model ready",
+          statusBusy: "Generating",
+          statusError: "Model error",
+          statusOffline: "Server offline",
+          statusGenFailed: "Generation failed",
+          deviceLabel: "Device",
+          checkpointLabel: "Checkpoint",
+          outputLabel: "Output",
+          pending: "pending",
+          checkpoint_default: "default",
+          checkpoint_ready: "ready",
+          outputEmpty: "-",
+          libraryTitle: "Generated Models",
+          librarySubtitle: "Scanning the output folder. Rename, delete, or open in Viewer.",
+          outputsEmpty: "No generated models yet.",
+          refreshBtn: "Refresh list",
+          actionView: "View",
+          actionRename: "Rename",
+          actionDelete: "Delete",
+          promptRename: "Enter a new name (you can omit .ply)",
+          confirmDelete: "Delete {name}?",
+          logSelected: "Selected {name}",
+          logModelError: "Model error: {error}",
+          logUpload: "Loading file...",
+          logGenDone: "Generation complete.",
+          logSelectFirst: "Load an image first.",
+          logOutputsFail: "Failed to load model list.",
+          logRenamed: "Renamed to {name}",
+          logDeleted: "Deleted {name}",
+          logServerOffline: "Unable to reach server.",
+        },
+      };
+
+      const t = (key, vars = {}) => {
+        const table = i18n[currentLang] || i18n.zh;
+        let text = table[key] || key;
+        Object.entries(vars).forEach(([name, value]) => {
+          text = text.replace(`{${name}}`, value);
+        });
+        return text;
+      };
+
+      const renderMetrics = () => {
+        deviceLine.textContent = `${t("deviceLabel")}: ${deviceValue || t("pending")}`;
+        checkpointLine.textContent = `${t("checkpointLabel")}: ${t(
+          `checkpoint_${checkpointStatus}`
+        )}`;
+        outputLine.textContent = `${t("outputLabel")}: ${outputValue || t("outputEmpty")}`;
+      };
+
+      const setStatus = (state, key) => {
+        statusState = state;
+        statusKey = key;
+        statusDot.className = "status-dot";
+        if (state) {
+          statusDot.classList.add(state);
+        }
+        statusText.textContent = t(key);
+      };
+
+      const logLine = (message) => {
+        const entry = document.createElement("p");
+        const now = new Date().toLocaleTimeString();
+        entry.textContent = `[${now}] ${message}`;
+        logEl.appendChild(entry);
+        logEl.scrollTop = logEl.scrollHeight;
+      };
+
+      const updateClock = () => {
+        clockEl.textContent = new Date().toLocaleString();
+      };
+      updateClock();
+      setInterval(updateClock, 1000);
+
+      const formatBytes = (bytes) => {
+        if (!bytes) return "0 B";
+        const units = ["B", "KB", "MB", "GB"];
+        let size = bytes;
+        let unitIndex = 0;
+        while (size >= 1024 && unitIndex < units.length - 1) {
+          size /= 1024;
+          unitIndex += 1;
+        }
+        return `${size.toFixed(size >= 10 || unitIndex === 0 ? 0 : 1)} ${units[unitIndex]}`;
+      };
+
+      const formatTime = (timestamp) => {
+        if (!timestamp) return "-";
+        return new Date(timestamp * 1000).toLocaleString();
+      };
+
+      const renderOutputs = (items) => {
+        outputsList.innerHTML = "";
+        if (!items || items.length === 0) {
+          outputsEmpty.style.display = "block";
+          return;
+        }
+        outputsEmpty.style.display = "none";
+        items.forEach((item) => {
+          const row = document.createElement("div");
+          row.className = "output-item";
+
+          const nameEl = document.createElement("div");
+          nameEl.className = "output-name";
+          nameEl.textContent = item.name;
+
+          const metaEl = document.createElement("div");
+          metaEl.className = "output-meta";
+          const sizeEl = document.createElement("span");
+          sizeEl.textContent = formatBytes(item.size_bytes);
+          const timeEl = document.createElement("span");
+          timeEl.textContent = formatTime(item.mtime);
+          metaEl.appendChild(sizeEl);
+          metaEl.appendChild(timeEl);
+
+          const actions = document.createElement("div");
+          actions.className = "output-actions";
+
+          const viewLink = document.createElement("a");
+          viewLink.className = "btn secondary";
+          viewLink.textContent = t("actionView");
+          viewLink.href = item.viewer_url;
+          viewLink.target = "_blank";
+          viewLink.rel = "noopener";
+
+          const renameBtn = document.createElement("button");
+          renameBtn.className = "btn secondary";
+          renameBtn.textContent = t("actionRename");
+          renameBtn.addEventListener("click", async () => {
+            const currentBase = item.name.replace(/\.ply$/i, "");
+            const nextName = window.prompt(t("promptRename"), currentBase);
+            if (!nextName) {
+              return;
+            }
+            let desired = nextName.trim();
+            if (!desired) {
+              return;
+            }
+            if (!desired.toLowerCase().endsWith(".ply")) {
+              desired = `${desired}.ply`;
+            }
+            if (desired === item.name) {
+              return;
+            }
+            try {
+              const res = await fetch("/api/outputs/rename", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ old_name: item.name, new_name: desired }),
+              });
+              const payload = await res.json();
+              if (!res.ok) {
+                throw new Error(payload.error || "Rename failed");
+              }
+              if (payload.items) {
+                renderOutputs(payload.items);
+              } else {
+                fetchOutputs(true);
+              }
+              if (outputValue && outputValue.includes(item.name)) {
+                outputValue = `/outputs/${encodeURIComponent(desired)}`;
+                renderMetrics();
+              }
+              logLine(t("logRenamed", { name: desired }));
+            } catch (err) {
+              logLine(err.message || t("logOutputsFail"));
+            }
+          });
+
+          const deleteBtn = document.createElement("button");
+          deleteBtn.className = "btn danger";
+          deleteBtn.textContent = t("actionDelete");
+          deleteBtn.addEventListener("click", async () => {
+            if (!window.confirm(t("confirmDelete", { name: item.name }))) {
+              return;
+            }
+            try {
+              const res = await fetch("/api/outputs/delete", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ name: item.name }),
+              });
+              const payload = await res.json();
+              if (!res.ok) {
+                throw new Error(payload.error || "Delete failed");
+              }
+              if (payload.items) {
+                renderOutputs(payload.items);
+              } else {
+                fetchOutputs(true);
+              }
+              if (outputValue && outputValue.includes(item.name)) {
+                outputValue = null;
+                renderMetrics();
+              }
+              logLine(t("logDeleted", { name: item.name }));
+            } catch (err) {
+              logLine(err.message || t("logOutputsFail"));
+            }
+          });
+
+          actions.appendChild(viewLink);
+          actions.appendChild(renameBtn);
+          actions.appendChild(deleteBtn);
+
+          row.appendChild(nameEl);
+          row.appendChild(metaEl);
+          row.appendChild(actions);
+          outputsList.appendChild(row);
+        });
+      };
+
+      const fetchOutputs = async (silent = false) => {
+        try {
+          const res = await fetch("/api/outputs");
+          const data = await res.json();
+          renderOutputs(data.items || []);
+        } catch (err) {
+          if (!silent) {
+            logLine(t("logOutputsFail"));
+          }
+        }
+      };
+
+      const applyLang = (lang) => {
+        currentLang = lang;
+        document.documentElement.lang = lang === "zh" ? "zh-Hans" : "en";
+        document.querySelectorAll("[data-i18n]").forEach((el) => {
+          const key = el.getAttribute("data-i18n");
+          if (key) {
+            el.textContent = t(key);
+          }
+        });
+        document.querySelectorAll("[data-lang]").forEach((btn) => {
+          btn.classList.toggle("active", btn.getAttribute("data-lang") === lang);
+        });
+        renderMetrics();
+        setStatus(statusState, statusKey);
+        fetchOutputs(true);
+      };
+
+      document.querySelectorAll("[data-lang]").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          applyLang(btn.getAttribute("data-lang"));
+        });
+      });
+
+      const handleFile = (file) => {
+        selectedFile = file;
+        if (!file) {
+          generateBtn.disabled = true;
+          return;
+        }
+        generateBtn.disabled = false;
+        previewHint.style.display = "none";
+        previewImg.style.display = "block";
+        if (previewUrl) {
+          URL.revokeObjectURL(previewUrl);
+        }
+        previewUrl = URL.createObjectURL(file);
+        previewImg.src = previewUrl;
+        logLine(t("logSelected", { name: file.name }));
+      };
+
+      fileInput.addEventListener("change", (event) => {
+        const file = event.target.files[0];
+        handleFile(file);
+      });
+
+      dropZone.addEventListener("dragover", (event) => {
+        event.preventDefault();
+        dropZone.classList.add("dragover");
+      });
+
+      dropZone.addEventListener("dragleave", () => {
+        dropZone.classList.remove("dragover");
+      });
+
+      dropZone.addEventListener("drop", (event) => {
+        event.preventDefault();
+        dropZone.classList.remove("dragover");
+        const file = event.dataTransfer.files[0];
+        if (file) {
+          fileInput.files = event.dataTransfer.files;
+          handleFile(file);
+        }
+      });
+
+      const pollHealth = async () => {
+        try {
+          const res = await fetch("/api/health");
+          const data = await res.json();
+          if (data.model_error) {
+            setStatus("error", "statusError");
+            logLine(t("logModelError", { error: data.model_error }));
+            return;
+          }
+          if (data.model_ready) {
+            setStatus("ready", "statusReady");
+            deviceValue = data.device || "unknown";
+            checkpointStatus = "ready";
+            renderMetrics();
+            return;
+          }
+          setStatus("", "statusLoading");
+          setTimeout(pollHealth, 2000);
+        } catch (err) {
+          setStatus("error", "statusOffline");
+          logLine(t("logServerOffline"));
+        }
+      };
+
+      applyLang("zh");
+      renderMetrics();
+      pollHealth();
+      fetchOutputs(true);
+
+      generateBtn.addEventListener("click", async () => {
+        if (!selectedFile) {
+          logLine(t("logSelectFirst"));
+          return;
+        }
+        generateBtn.disabled = true;
+        viewerBtn.classList.add("disabled");
+        viewerBtn.removeAttribute("href");
+        setStatus("busy", "statusBusy");
+        logLine(t("logUpload"));
+
+        const formData = new FormData();
+        formData.append("image", selectedFile);
+
+        try {
+          const res = await fetch("/api/predict", {
+            method: "POST",
+            body: formData,
+          });
+          if (!res.ok) {
+            const err = await res.json();
+            throw new Error(err.error || "Prediction failed");
+          }
+          const data = await res.json();
+          logLine(t("logGenDone"));
+          outputValue = data.ply_url;
+          renderMetrics();
+          viewerBtn.href = data.viewer_url;
+          viewerBtn.classList.remove("disabled");
+          setStatus("ready", "statusReady");
+          fetchOutputs(true);
+        } catch (err) {
+          setStatus("error", "statusGenFailed");
+          logLine(err.message);
+        } finally {
+          generateBtn.disabled = false;
+        }
+      });
+
+      refreshOutputsBtn.addEventListener("click", () => {
+        fetchOutputs();
+      });
+
+      window.addEventListener("beforeunload", () => {
+        const blob = new Blob(["shutdown"], { type: "text/plain" });
+        navigator.sendBeacon("/api/shutdown", blob);
+      });
+    </script>
+  </body>
+</html>

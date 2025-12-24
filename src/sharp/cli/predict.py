@@ -97,6 +97,8 @@ def predict_cli(
     else:
         for ext in extensions:
             image_paths.extend(list(input_path.glob(f"**/*{ext}")))
+        # On Windows, case-insensitive globbing can duplicate matches (e.g., .jpg vs .JPG).
+        image_paths = sorted({path.resolve() for path in image_paths})
 
     if len(image_paths) == 0:
         LOGGER.info("No valid images found. Input was %s.", input_path)
