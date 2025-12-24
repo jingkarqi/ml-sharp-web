@@ -1,5 +1,2 @@
 .venv/
-input/
-output/
-
-src/
+src/models
