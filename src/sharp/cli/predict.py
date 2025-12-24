@@ -34,7 +34,7 @@ from .render import render_gaussians
 LOGGER = logging.getLogger(__name__)
 
 DEFAULT_MODEL_URL = "https://ml-site.cdn-apple.com/models/sharp/sharp_2572gikvuh.pt"
-DEFAULT_CHECKPOINT_PATH = Path(r"E:\GitHub\modelPT\sharp_2572gikvuh.pt")
+DEFAULT_CHECKPOINT_PATH = Path(r"src\models\sharp_2572gikvuh.pt")
 
 
 @click.command()
