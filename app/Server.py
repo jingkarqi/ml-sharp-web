@@ -6,6 +6,7 @@ import sys
 import threading
 import time
 import uuid
+import webbrowser
 from pathlib import Path
 from typing import Any
 from urllib.parse import quote
@@ -339,4 +340,6 @@ def api_shutdown() -> Any:
 if __name__ == "__main__":
     _ensure_initialized()
     LOGGER.info("Starting server at http://%s:%s", HOST, PORT)
+    if os.getenv("SHARP_NO_BROWSER", "").strip().lower() not in {"1", "true", "yes"}:
+        threading.Timer(1.0, lambda: webbrowser.open(f"http://{HOST}:{PORT}/")).start()
     app.run(host=HOST, port=PORT, debug=False, use_reloader=False)
