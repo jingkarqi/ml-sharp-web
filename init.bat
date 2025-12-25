@@ -1,4 +1,4 @@
-﻿@echo off
+@echo off
 chcp 65001 >nul
 setlocal
 cd /d "%~dp0"
@@ -19,10 +19,10 @@ if not exist "%VENV_PY%" (
 )
 
 echo "正在检查环境..."
-"%VENV_PY%" env-check-init\check_env.py
+"%VENV_PY%" check_env.py
 echo.
 echo "正在初始化环境..."
-"%VENV_PY%" env-check-init\init_env.py
+"%VENV_PY%" init_env.py
 echo.
 echo "初始化完成。"
 echo Done
